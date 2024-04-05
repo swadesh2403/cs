@@ -1,0 +1,55 @@
+line vty 0 4
+password vtypa55
+login
+
+enable secret enpa55
+
+router ospf 1
+network 192.168.1.0 0.0.0.255 area 0
+network 10.1.1.0 0.0.0.3 area 0
+
+router ospf 1
+network 10.1.1.0 0.0.0.3 area 0
+network 10.2.2.0 0.0.0.3 area 0
+
+router ospf 1
+network 192.168.3.0 0.0.0.255 area 0
+network 10.2.2.0 0.0.0.3 area 0
+
+
+router ospf 1 
+area 0 authentication message-digest
+int se0/1/0
+ip ospf message-digest-key 1 md5 md5pa55
+int se0/1/0
+ip ospf message-digest-key 1 md5 md5pa55
+int se0/1/1
+ip ospf message-digest-key 1 md5 md5pa55
+int se0/1/0
+ip ospf message-digest-key 1 md5 md5pa55
+
+
+
+ntp server 192.168.1.5
+ntp update-calendar
+
+ntp authenticate
+ntp trusted-key 1
+ntp authentication-key 1 md5 ntppa55
+service timestamps log datetime msec
+logging host 192.168.1.6
+
+
+ip domain-name ccnasecurity.com
+username admin privilege 15 secret sshpa55
+line vty 0 4
+login local
+transport input ssh
+crypto key zeroize rsa
+crypto key generate rsa
+
+ip ssh time-out 90
+ip ssh authentication-retries 2
+ip ssh version 2
+
+

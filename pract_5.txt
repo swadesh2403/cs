@@ -1,0 +1,45 @@
+line console 0
+password conpa55
+login
+line vty 0 4
+password vtypa55
+login
+enable secret enpa55
+ip domain-name ccnasecurity.com
+username admin secret adminpa55
+line vty 0 4
+login local
+crypto key generate rsa
+
+
+license boot module c1900 technology-package securityk9
+
+zone security IN-ZONE
+exit
+zone security OUT-ZONE
+exit
+
+access-list 101 permit ip 192.168.3.0 0.0.0.255 any
+class-map type inspect match-all IN-NET-CLASS-MAP
+match access-group 101
+exit
+
+
+policy-map type inspect IN-2-OUT-PMAP
+class type inspect IN-NET-CLASS-MAP
+inspect
+exit
+exit
+
+zone-pair security IN-2-OUT-ZPAIR source IN-ZONE destination OUT-ZONE
+service-policy type inspect IN-2-OUT-PMAP
+exit
+
+int gig0/0
+zone-member security IN-ZONE
+exit
+int se0/1/0
+zone-member security OUT-ZONE
+
+
+show policy-map type inspect zone-pair sessions

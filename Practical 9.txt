@@ -1,0 +1,69 @@
+enable secret enpa55
+line console 0
+password conpa55
+login
+exit
+ip domain-name ccnasecurity.com
+username admin secret adminpa55
+line vty 0 4
+login local
+crypto key generate rsa
+1024
+
+router ospf 1
+network 192.168.1.0 0.0.0.255 area 0
+network 10.1.1.0 0.0.0.3 area 0
+
+router ospf 1
+network 192.168.2.0 0.0.0.255 area 0
+network 10.2.2.0 0.0.0.3 area 0
+network 10.1.1.0 0.0.0.3 area 0
+
+router ospf 1
+network 192.168.3.0 0.0.0.255 area 0
+network 10.2.2.0 0.0.0.3 area 0
+
+license boot module c1900 technology-package securityk9
+copy run start
+reload
+
+access-list 110 permit ip 192.168.1.0 0.0.0.255 192.168.3.0 0.0.0.255
+crypto isakmp policy 10
+encryption aes 256
+authentication pre-share
+group 5
+exit
+crypto isakmp key vpnpa55 address 10.2.2.2
+crypto ipsec transform-set VPN-SET esp-aes esp-sha-hmac
+crypto map VPN-MAP 10 ipsec-isakmp
+description VPN connection to R3
+set peer 10.2.2.2
+set transform-set VPN-SET
+match address 110
+exit
+int se0/1/0
+crypto map VPN-MAP
+
+__________________________
+license boot module c1900 technology-package securityk9
+copy run start
+reload
+
+access-list 110 permit ip 192.168.3.0 0.0.0.255 192.168.1.0 0.0.0.255
+crypto isakmp policy 10
+encryption aes 256
+authentication pre-share
+group 5
+exit
+crypto isakmp key vpnpa55 address 10.1.1.2
+crypto ipsec transform-set VPN-SET esp-aes esp-sha-hmac
+crypto map VPN-MAP 10 ipsec-isakmp
+description VPN connection to R1
+set peer 10.1.1.2
+set transform-set VPN-SET
+match address 110
+exit
+int se0/1/0
+crypto map VPN-MAP
+
+show crypto ipsec sa

@@ -1,0 +1,30 @@
+line vty 0 4
+password vtypa55
+login
+enable secret enpa55
+router ospf 1
+network 192.168.1.0 0.0.0.255 area 0
+area 0 authentication message-digest
+int gig0/0
+ip ospf message-digest-key 1 md5 md5pa55
+
+
+
+username admin secret adminpa55
+aaa new-model
+
+aaa authentication login default local
+line console 0
+login authentication default
+
+
+ip domain-name ccnasecurity.com
+crypto key generate rsa
+
+
+aaa authentication login ssh-login local
+line vty 0 4
+login authentication ssh-login
+
+transport input ssh
+end

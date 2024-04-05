@@ -1,0 +1,108 @@
+enable secret enpa55
+line console 0
+password conpa55
+login
+exit
+ip domain-name ccnasecurity.com
+username admin secret adminpa55
+line vty 0 4
+login local
+crypto key generate rsa
+
+show vlan brief
+
+vlan 5
+exit
+vlan 10
+exit
+vlan 15
+exit
+
+int fa0/2
+switchport mode access
+switchport access vlan 10
+int fa0/3
+switchport mode access
+switchport access vlan 10
+int fa0/4
+switchport mode access
+switchport access vlan 5
+
+
+int fa0/1
+switchport mode access
+switchport access vlan 5
+int fa0/2
+switchport mode access
+switchport access vlan 5
+int fa0/3
+switchport mode access
+switchport access vlan 5
+int fa0/4
+switchport mode access
+switchport access vlan 10
+
+
+
+int fa0/24
+switchport mode trunk
+switchport trunk native vlan 15
+
+
+
+int fa0/24
+switchport mode trunk
+switchport trunk native vlan 15
+int gig0/1
+switchport mode trunk
+switchport trunk native vlan 15
+
+
+
+int gig0/0
+switchport mode trunk
+switchport trunk native vlan 15
+int fa0/24
+switchport mode trunk
+switchport trunk native vlan 15
+
+
+int range gig0/1-2
+switchport mode trunk
+switchport trunk native vlan 15
+int fa0/1
+switchport mode trunk
+switchport trunk native vlan 15
+
+
+
+
+int gig0/0.1
+encapsulation dot1q 5
+ip address 192.168.5.100 255.255.255.0
+exit
+int gig0/0.2
+encapsulation dot1q 10
+ip address 192.168.10.100 255.255.255.0
+exit
+int gig0/0.15
+encapsulation dot1q 15
+ip address 192.168.15.100 255.255.255.0
+
+
+int fa0/23
+switchport mode trunk
+switchport trunk native vlan 15
+switchport nonegotiate
+
+
+vlan 20
+exit
+int vlan 20
+ip address 192.168.20.1 255.255.255.0
+
+vlan 20
+exit
+
+int vlan 20
+ip address 192.168.20.2 255.255.255.0

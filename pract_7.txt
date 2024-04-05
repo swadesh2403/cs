@@ -1,0 +1,32 @@
+enable secret enpa55
+line console 0
+password conpa55
+login
+ip domain-name ccnasecurity.com
+username admin secret adminpa55
+line vty 0 4
+login local
+crypto key generate rsa
+
+
+int range fa0/1-4
+spanning-tree portfast
+int range fa0/1-4
+spanning-tree bpdugaurd enable
+
+
+show spanning-tree
+intrange fa0/23-24
+spanning-tree guard root
+
+int range fa0/1-22
+switchport mode access
+switchport port-security
+switchport port-security maximum 2
+switchport port-security violation shutdown
+switchport port-security mac-address sticky
+
+show port-security int fa0/1
+
+int range fa0/5-22
+shutdown

@@ -1,0 +1,91 @@
+enable secret enpa55
+line console 0
+password conpa55
+login
+ip domain-name ccnasecurity.com
+username admin secret adminpa55
+line vty 0 4
+login local
+crypto key generate rsa
+
+router ospf 1
+network 209.165.200.0 0.0.0.7 area 0
+network 10.1.1.0 0.0.0.3 area 0
+
+router ospf 1
+network 10.1.1.0 0.0.0.3 area 0
+network 10.2.2.0 0.0.0.3 area 0
+
+router ospf 1
+network 172.16.3.0 0.0.0.255 area 0
+network 10.2.2.0 0.0.0.3 area 0
+
+hostname CCNAS-ASA
+domain-name ccnasecurity.com
+enable password enpa55
+clock set 16:45:10 27 Mar 2024
+
+int vlan 1
+nameif inside
+ip address 192.168.1.1 255.255.255.0
+security-level 100
+
+int vlan 2
+nameif outside
+ip address 209.165.200.226 255.255.255.248
+security-level 0
+
+show int ip brief
+show ip address
+show switch vlan
+
+show route
+route outside 0.0.0.0 0.0.0.0 209.165.200.225
+
+object network inside-net
+subnet 192.168.1.0 255.255.255.0
+nat(inside,outside) dynamic interface
+end
+
+show nat
+
+class-map inspection_default
+match default-inspection-traffic
+exit
+policy-map global_policy
+class inspection_default
+inspect icmp
+exit
+service-policy global_policy global
+
+dhcpd address 192.168.1.5-192.168.1.36 inside
+dhcpd dns 209.165.201.2 int inside
+dhcpd enable inside
+username admin password adminpa55
+aaa authentication ssh console LOCAL
+crypto key generate rsa modulus 1024
+ssh 192.168.10 255.255.255.0 inside
+ssh 172.16.3.3 255.255.255.255 outside
+ssh timeout 10
+
+
+int vlan3
+ip address 192.168.2.1 255.255.255.0
+no forward int vlan 1
+nameif dmz
+security-level 70
+int et0/2
+switchport access vlan3
+
+show int ip brief
+
+show ip address
+show switch vlan
+
+object network dmz-server
+host 192.168.2.3
+nat (dmz,outside) static 209.165.200.227
+exit
+access-list OUTSIDE-DMZ permit icmp any host 192.168.2.3
+access-list OUTSIDE-DMZ permit tcp any host 192.168.2.3 eq 80
+access-group OUTSIDE-DMZ in int outside

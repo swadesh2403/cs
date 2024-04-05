@@ -1,0 +1,13 @@
+line vty 0 4
+password vtypa55
+login
+enable secret enpa55
+access-list 100 permit tcp 172.22.34.64 0.0.0.31 host 172.22.34.62 eq ftp
+access-list 100 permit icmp 172.22.34.64 0.0.0.31 host 172.22.34.62 
+int gig0/0
+ip access-group 100 in
+ip access-list extended HTTP_ONLY
+permit tcp 172.22.34.96 0.0.0.15 host 172.22.34.62 eq www
+permit icmp 172.22.34.96 0.0.0.15 host 172.22.34.62
+int gig0/1
+ip access-group HTTP_ONLY in
